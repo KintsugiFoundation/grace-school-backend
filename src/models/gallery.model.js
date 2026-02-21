@@ -1,13 +1,14 @@
-import pool from './../configs/db.js'
+import Gallery from '../data/createGalleryTable.js';
+import Category from '../data/createCategoryTable.js';
 
 export const createGalleryService = async (categoryId, gallery) => {
     try {
-        const result = await pool.query(
-            'INSERT INTO galleries (category_id, gallery) VALUES ($1, $2) RETURNING *',
-            [categoryId, gallery]
-        );
-
-        return result.rows[0];
+        const newGallery = new Gallery({
+            category_id: categoryId,
+            gallery: gallery
+        });
+        const savedGallery = await newGallery.save();
+        return savedGallery;
     } catch (error) {
         throw error;
     }
@@ -15,67 +16,65 @@ export const createGalleryService = async (categoryId, gallery) => {
 
 export const getAllGalleriesService = async () => {
     try {
-        const result = await pool.query('SELECT * FROM galleries')
-
-        return result.rows
-    } catch (error) {
-        
-    }
-}
-
-export const getGalleryByIdService = async (id) => {
-    try {
-        const result = await pool.query('SELECT * FROM galleries WHERE gallery_id = $1', [id])
-
-        return result.rows[0]
-    } catch (error) {
-        throw error
-    }
-}
-
-export const getAllCategoriesWithGalleriesService = async () => {
-    try {
-        const result = await pool.query(`
-            SELECT 
-                c.category_id,
-                c.category_name,  /* Changed from c.name to c.category_name */
-                COALESCE(
-                    json_agg(
-                        json_build_object(
-                            'gallery_id', g.gallery_id,
-                            'gallery_path', g.gallery
-                        )
-                    ) FILTER (WHERE g.gallery_id IS NOT NULL),
-                    '[]'
-                ) as galleries
-            FROM categories c
-            LEFT JOIN galleries g ON c.category_id = g.category_id
-            GROUP BY c.category_id, c.category_name
-            ORDER BY c.category_id
-        `);
-
-        return result.rows;
+        const galleries = await Gallery.find().populate('category_id');
+        return galleries;
     } catch (error) {
         throw error;
     }
 }
 
-export const updateGalleryService = async ( categoryId, gallery, galleryId) => {
+export const getGalleryByIdService = async (id) => {
     try {
-        const result = await pool.query('UPDATE galleries SET category_id = $1, gallery = $2 WHERE gallery_id = $3', [categoryId, gallery, galleryId])
-
-        return result.rows[0]
+        const gallery = await Gallery.findById(id).populate('category_id');
+        return gallery;
     } catch (error) {
-        throw error
+        throw error;
+    }
+}
+
+export const getAllCategoriesWithGalleriesService = async () => {
+    try {
+        const categories = await Category.find();
+        const result = await Promise.all(
+            categories.map(async (category) => {
+                const galleries = await Gallery.find({ category_id: category._id });
+                return {
+                    _id: category._id,
+                    category_name: category.category_name,
+                    galleries: galleries.map(g => ({
+                        _id: g._id,
+                        gallery_path: g.gallery
+                    }))
+                };
+            })
+        );
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const updateGalleryService = async (categoryId, gallery, galleryId) => {
+    try {
+        const updatedGallery = await Gallery.findByIdAndUpdate(
+            galleryId,
+            {
+                category_id: categoryId,
+                gallery: gallery
+            },
+            { new: true }
+        );
+        return updatedGallery;
+    } catch (error) {
+        throw error;
     }
 }
 
 export const deleteGalleryService = async (id) => {
     try {
-        const result = await pool.query('DELETE FROM galleries WHERE gallery_id = $1', id)
-
-        return result.rows[0]
+        const deletedGallery = await Gallery.findByIdAndDelete(id);
+        return deletedGallery;
     } catch (error) {
-        
+        throw error;
     }
 }

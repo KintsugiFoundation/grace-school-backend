@@ -1,24 +1,25 @@
-import pool from "../configs/db.js"
+import mongoose from 'mongoose';
 
-const createCategoryTable = async () => {
-    const queryText = `
-    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-    CREATE TABLE IF NOT EXISTS galleries (
-    gallery_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    category_id uuid REFERENCES categories(category_id),
-    gallery TEXT NOT NULL,
-    gallery_date TIMESTAMP DEFAULT NOW(),
-    created_at TIMESTAMP DEFAULT NOW()
-);
-    `
-
-    try {
-        await pool.query(queryText)
-        console.log("Categories table created successfully")
-    } catch (error) {
-        console.error("Error creating categories table:", error)
-        throw error
+const gallerySchema = new mongoose.Schema({
+    category_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
+        required: true
+    },
+    gallery: {
+        type: String,
+        required: true
+    },
+    gallery_date: {
+        type: Date,
+        default: Date.now
+    },
+    created_at: {
+        type: Date,
+        default: Date.now
     }
-}
+});
 
-export default createCategoryTable
+const Gallery = mongoose.model('Gallery', gallerySchema);
+
+export default Gallery;

@@ -1,25 +1,29 @@
-import pool from "../configs/db.js"
+import mongoose from 'mongoose';
 
-const createUsersTable = async () => {
-    const queryText = `
-    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-    CREATE TABLE IF NOT EXISTS users (
-        user_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-        user_name TEXT NOT NULL,
-        user_email TEXT NOT NULL UNIQUE,
-        user_password TEXT NOT NULL,
-        user_role TEXT NOT NULL DEFAULT 'user',
-        created_at TIMESTAMP DEFAULT NOW()
-    )
-    `
-
-    try {
-        await pool.query(queryText)
-        console.log("Users table created successfully")
-    } catch (error) {
-        console.error("Error creating users table:", error)
-        throw error
+const userSchema = new mongoose.Schema({
+    user_name: {
+        type: String,
+        required: true
+    },
+    user_email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    user_password: {
+        type: String,
+        required: true
+    },
+    user_role: {
+        type: String,
+        default: 'user'
+    },
+    created_at: {
+        type: Date,
+        default: Date.now
     }
-}
+});
 
-export default createUsersTable
+const User = mongoose.model('User', userSchema);
+
+export default User;

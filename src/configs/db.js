@@ -1,24 +1,16 @@
-import pkg from 'pg';
-import dotenv from 'dotenv'
-const { Pool } = pkg;
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 
-dotenv.config()
+dotenv.config();
 
-console.log(process.env.DB_HOST)
-console.log(process.env.DB_USER)
-
-const pool = new Pool(
-    {
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_DATABASE,
-        port: process.env.DB_PORT,
+const connectDB = async () => {
+    try {
+        const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/graceschool');
+        console.log(`MongoDB Connected: ${conn.connection.host}`);
+    } catch (error) {
+        console.error(`Error: ${error.message}`);
+        process.exit(1);
     }
-)
+};
 
-pool.on('connect', () => {
-    console.log('Connection Pool established')
-})
-
-export default pool
+export default connectDB;

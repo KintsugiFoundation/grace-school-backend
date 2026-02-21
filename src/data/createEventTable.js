@@ -1,25 +1,28 @@
-import pool from "../configs/db.js"
+import mongoose from 'mongoose';
 
-const createEventTable = async () => {
-    const queryText = `
-    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-    CREATE TABLE IF NOT EXISTS events (
-        event_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-        event_name TEXT NOT NULL,
-        event_type TEXT NOT NULL,
-        event_startDate TEXT NOT NULL,
-        event_endDate TEXT NOT NULL,
-        created_at TIMESTAMP DEFAULT NOW()
-    )
-    `
-
-    try {
-        await pool.query(queryText)
-        console.log("Events table created successfully")
-    } catch (error) {
-        console.error("Error creating events table:", error)
-        throw error
+const eventSchema = new mongoose.Schema({
+    event_name: {
+        type: String,
+        required: true
+    },
+    event_type: {
+        type: String,
+        required: true
+    },
+    event_startDate: {
+        type: String,
+        required: true
+    },
+    event_endDate: {
+        type: String,
+        required: true
+    },
+    created_at: {
+        type: Date,
+        default: Date.now
     }
-}
+});
 
-export default createEventTable
+const Event = mongoose.model('Event', eventSchema);
+
+export default Event;

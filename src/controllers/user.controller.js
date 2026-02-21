@@ -32,8 +32,6 @@ export const loginUser = async (req, res, next) => {
 
         const user = await loginUserService(email, password)
 
-        console.log("user:", user)
-
         if(!user) return handleResponse(res, 404, "User not found")
         
         const validPassword = await bcrypt.compare(password, user.user_password)
@@ -41,8 +39,6 @@ export const loginUser = async (req, res, next) => {
         if (!validPassword) return handleResponse(res, 401, "Incorrect password")
 
         let tokens = jwtTokens(user)
-
-        console.log("Tokens: ", tokens)
 
         res.cookie('refresh_token', tokens.refreshToken, {httpOnly: true})
 

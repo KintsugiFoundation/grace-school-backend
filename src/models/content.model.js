@@ -1,61 +1,66 @@
-import pool from "../configs/db";
+import Content from "../data/createContentTable.js";
 
 export const createContentService = async (folderId, content) => {
     try {
-        const result = await pool.query('INSERT INTO contents (folder_id, content) VALUES ($1, $2) RETURNING *', [folderId, content])
-
-        return result.rows[0]
+        const newContent = new Content({
+            folder_id: folderId,
+            content: content
+        });
+        const savedContent = await newContent.save();
+        return savedContent;
     } catch (error) {
-        throw error
+        throw error;
     }
 }
 
 export const getAllContentService = async () => {
     try {
-        const result = await pool.query('SELECT * FROM contents')
-
-        return result.rows
+        const contents = await Content.find().populate('folder_id');
+        return contents;
     } catch (error) {
-        throw error
+        throw error;
     }
 }
 
 export const getContentByFolderService = async (folderId) => {
     try {
-        const result = await pool.query('SELECT * FROM contents WHERE folder_id = $1',[folderId])
-
-        return result.rows
+        const contents = await Content.find({ folder_id: folderId }).populate('folder_id');
+        return contents;
     } catch (error) {
-        throw error
+        throw error;
     }
 }
 
 export const getContentByIdService = async (id) => {
     try {
-        const result = await pool.query('SELECT * FROM contents WHERE content_id = $1',[id])
-
-        return result.rows
+        const content = await Content.findById(id).populate('folder_id');
+        return content;
     } catch (error) {
-        throw error
+        throw error;
     }
 }
 
 export const updateContentService = async (id, folderId, content) => {
     try {
-        const result = await pool.query('UPDATE contents SET (folder_id = $1, content = $2) WHERE content_id = $3', [folderId, content, id])
-
-        return result.rows[0]
+        const updatedContent = await Content.findByIdAndUpdate(
+            id,
+            {
+                folder_id: folderId,
+                content: content
+            },
+            { new: true }
+        );
+        return updatedContent;
     } catch (error) {
-        throw error
+        throw error;
     }
 }
 
 export const deleteContentService = async (id) => {
     try {
-        const result = await pool.query('DELETE FROM contents WHERE content_id = $1 RETURNING *', [id])
-
-        return result.rows[0]
+        const deletedContent = await Content.findByIdAndDelete(id);
+        return deletedContent;
     } catch (error) {
-        throw error
+        throw error;
     }
 }

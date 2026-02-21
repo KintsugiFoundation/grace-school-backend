@@ -1,24 +1,25 @@
-import pool from "../configs/db.js"
+import mongoose from 'mongoose';
 
-const createContentTable = async () => {
-    const queryText = `
-    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-    CREATE TABLE IF NOT EXISTS contents (
-    content_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    folder_id uuid REFERENCES folders(folder_id),
-    content TEXT NOT NULL,
-    content_date TIMESTAMP DEFAULT NOW(),
-    created_at TIMESTAMP DEFAULT NOW()
-);
-    `
-
-    try {
-        await pool.query(queryText)
-        console.log("Contents table created successfully")
-    } catch (error) {
-        console.error("Error creating contents table:", error)
-        throw error
+const contentSchema = new mongoose.Schema({
+    folder_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Folder',
+        required: true
+    },
+    content: {
+        type: String,
+        required: true
+    },
+    content_date: {
+        type: Date,
+        default: Date.now
+    },
+    created_at: {
+        type: Date,
+        default: Date.now
     }
-}
+});
 
-export default createContentTable
+const Content = mongoose.model('Content', contentSchema);
+
+export default Content;

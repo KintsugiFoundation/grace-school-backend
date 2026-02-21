@@ -1,51 +1,61 @@
-import pool from './../configs/db.js'
+import Event from '../data/createEventTable.js';
 
 export const createEventService = async (eventName, eventType, eventStartDate, eventEndDate) => {
     try {
-        const result = await pool.query('INSERT INTO events (event_name, event_type, event_startDate, event_endDate) VALUES ($1, $2, $3, $4) RETURNING *', [eventName, eventType, eventStartDate, eventEndDate])
-
-        return result.rows[0]
+        const newEvent = new Event({
+            event_name: eventName,
+            event_type: eventType,
+            event_startDate: eventStartDate,
+            event_endDate: eventEndDate
+        });
+        const savedEvent = await newEvent.save();
+        return savedEvent;
     } catch (error) {
-        throw error
+        throw error;
     }
 }
 
 export const getAllEventService = async () => {
     try {
-        const result = await pool.query('SELECT * FROM events')
-
-        return result.rows
+        const events = await Event.find();
+        return events;
     } catch (error) {
-        throw error
+        throw error;
     }
 }
 
 export const getEventByIdService = async (id) => {
     try {
-        const result = await pool.query('SELECT * FROM events WHERE event_id = $1', [id])
-
-        return result.rows[0]
+        const event = await Event.findById(id);
+        return event;
     } catch (error) {
-        throw error
+        throw error;
     }
 }
 
 export const updateEventService = async (id, eventName, eventType, eventStartDate, eventEndDate) => {
     try {
-        const result = await pool.query('UPDATE events SET event_name = $1, event_type = $2 , event_startDate = $3, event_endDate = $4 WHERE event_id = $5 RETURNING *', [eventName, eventType, eventStartDate, eventEndDate, id])
-
-        return result.rows[0]
+        const updatedEvent = await Event.findByIdAndUpdate(
+            id,
+            {
+                event_name: eventName,
+                event_type: eventType,
+                event_startDate: eventStartDate,
+                event_endDate: eventEndDate
+            },
+            { new: true }
+        );
+        return updatedEvent;
     } catch (error) {
-        throw error
+        throw error;
     }
 }
 
 export const deleteEventService = async (id) => {
     try {
-        const result = await pool.query('DELETE FROM events WHERE id = $1 RETURNING *', [id])
-
-        return result.rows[0]
+        const deletedEvent = await Event.findByIdAndDelete(id);
+        return deletedEvent;
     } catch (error) {
-        throw error
+        throw error;
     }
 }
