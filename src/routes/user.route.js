@@ -18,6 +18,7 @@ router.post('/add-user', validateUser, createUser )
 // Login route
 router.post('/login', validateLogin, loginUser )
 
+/** Clears the refresh token cookie and logs the user out */
 router.delete('/logout', (req, res) => {
     try {
         res.clearCookie('refresh_token')
@@ -43,6 +44,7 @@ router.patch('/update-user/:id', validateUser, updateUser )
 // Delete user by id
 router.delete('/delete-user/:id', deleteUser )
 
+/** Verifies the refresh token cookie abd issues a new access token */
 router.get('/refresh_token', (req, res) => {
     try {
         const refreshToken = req.cookies.refresh_token
