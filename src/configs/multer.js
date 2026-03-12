@@ -1,3 +1,8 @@
+/** 
+ * multer.js
+ * Multer configuration for file uploads
+ * supports images and content up to 30MB
+ */
 import multer from 'multer'
 import fs from 'fs'
 import path from 'path'
@@ -35,7 +40,7 @@ const storage = multer.diskStorage({
         cb(null, prefix + uniqueSuffix + extension);
     }
 });
-
+/**Validates file MIME type based on field name */
 const fileFilter = (req, file, cb) => {
     const allowedMimeTypes = [
         'application/pdf',
