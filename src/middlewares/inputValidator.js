@@ -1,3 +1,8 @@
+/**
+ * inputValidator.js
+ * Joi validation middleware for user registration input.
+ * Validates username, email and password before passing to the controller.
+ */
 import Joi from "joi";
 
 const userSchema = Joi.object({
@@ -6,6 +11,7 @@ const userSchema = Joi.object({
     password: Joi.string().min(8).required(),
 })
 
+/** Validates user registration request body against the Joi schema */
 const validateUser = (req, res, next) => {
     const {error} = userSchema.validate(req.body)
 

@@ -1,3 +1,7 @@
+/** 
+ * db.js
+ * Connects to MongoDB with URI in .env falls back on local MongoDB
+ */
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 

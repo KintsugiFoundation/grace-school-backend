@@ -1,4 +1,4 @@
-import Contact from "../data/createContactTable";
+import Contact from "../data/createContactTable.js";
 
 export const createContactService = async (contactData) => {
       try {
