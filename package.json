@@ -7,7 +7,7 @@
   "scripts": {
     "test": "npm run test",
     "dev": "nodemon src/index.js",
-    "start": "node index.js",
+    "start": "node src/index.js",
     "seed": "node src/data/seedUser.js"
   },
   "repository": {
